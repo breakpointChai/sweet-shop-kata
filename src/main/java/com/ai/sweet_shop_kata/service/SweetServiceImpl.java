@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class SweetServiceImpl implements SweetService {
@@ -45,9 +46,13 @@ public class SweetServiceImpl implements SweetService {
         return mapper.map(sweetEntity, SweetDto.class);
     }
 
+    // get all sweets
     @Override
     public List<SweetDto> getSweets() {
-        return List.of();
+        List<SweetEntity> sweets = sweetRepository.findAll();
+        return sweets.stream()
+                .map(sweet -> mapper.map(sweet, SweetDto.class))
+                .collect(Collectors.toList());
     }
 
     @Override
