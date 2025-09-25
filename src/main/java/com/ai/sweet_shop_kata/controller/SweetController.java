@@ -50,6 +50,13 @@ public class SweetController {
         return new ResponseEntity<>(sweet, HttpStatus.OK);
     }
 
+    // search sweets
+    @GetMapping("/search")
+    public ResponseEntity<List<SweetDto>> searchSweets(@RequestParam String title) {
+        List<SweetDto> sweets = sweetService.searchByTitle(title);
+        return new ResponseEntity<>(sweets, HttpStatus.OK);
+    }
+
 
 
 
