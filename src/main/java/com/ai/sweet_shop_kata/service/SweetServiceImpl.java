@@ -73,6 +73,9 @@ public class SweetServiceImpl implements SweetService {
 
     @Override
     public List<SweetDto> searchByTitle(String title) {
-        return List.of();
+        List<SweetEntity> sweets = sweetRepository.findByNameContainingIgnoreCase(title);
+        return sweets.stream()
+                .map(sweet -> mapper.map(sweet, SweetDto.class))
+                .collect(Collectors.toList());
     }
 }

@@ -9,4 +9,6 @@ public interface SweetRepository extends JpaRepository<SweetEntity,String> {
     // Method for searching sweets by name, ignoring case
     List<SweetEntity> findByNameContainingIgnoreCase(String nameKeyword);
 
+
+
 }
