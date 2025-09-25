@@ -1,15 +1,8 @@
-package com.lcwd.electronic.store.entities;
+package com.ai.sweet_shop_kata.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-//By using lombook
 @Getter
 @Setter
 @NoArgsConstructor
@@ -40,38 +33,4 @@ public class UserEntity   {
     private String imageName;
 
 
-
-    //important
-    @Override
-    public String getUsername() {
-        return this.getEmail();
-    }
-
-    //important
-    // lombok
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 }
