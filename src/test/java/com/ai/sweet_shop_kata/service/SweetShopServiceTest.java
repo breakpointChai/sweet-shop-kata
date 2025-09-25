@@ -1,5 +1,7 @@
 package com.ai.sweet_shop_kata.service;
 
+import com.ai.sweet_shop_kata.model.SweetEntity;
+import com.ai.sweet_shop_kata.repository.SweetRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +20,7 @@ public class SweetShopServiceTest {
 
     @Test
     void shouldAddSweetSuccessfully() {
-        Sweet sweet = new Sweet(1L, "Ladoo", "Indian", 15.0, 100, true, "Delicious ladoos");
+        SweetEntity sweet = new SweetEntity(1L, "Ladoo", "Indian", 15.0, 100, true, "Delicious ladoos");
 
         when(sweetRepository.save(sweet)).thenReturn(sweet);
 
