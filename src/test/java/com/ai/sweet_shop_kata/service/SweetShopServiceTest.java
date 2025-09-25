@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -95,5 +96,19 @@ class SweetShopServiceTest {
         });
 
         verify(sweetRepository, times(1)).findById(sweetId);
+    }
+
+    @Test
+    void testGetSweets_ShouldReturnListOfSweetDtos() {
+        // Arrange
+        List<SweetEntity> sweetEntities = List.of(new SweetEntity(), new SweetEntity());
+        when(sweetRepository.findAll()).thenReturn(sweetEntities);
+
+        // Act
+        List<SweetDto> sweets = sweetService.getSweets();
+
+        // Assert
+        assertEquals(2, sweets.size());
+        verify(sweetRepository, times(1)).findAll();
     }
 }
