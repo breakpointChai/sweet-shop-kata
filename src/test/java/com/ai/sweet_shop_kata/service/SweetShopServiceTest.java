@@ -23,7 +23,7 @@ class SweetShopServiceTest {
     @BeforeEach
     void setUp() {
         sweetRepository = mock(SweetRepository.class);
-        mapper = new ModelMapper();
+        mapper = mock(ModelMapper.class);
         sweetService = new SweetServiceImpl();
         sweetService.sweetRepository = sweetRepository; // inject mock
         sweetService.mapper = mapper; // inject real mapper
@@ -73,16 +73,23 @@ class SweetShopServiceTest {
         sweetEntity.setId(sweetId);
         sweetEntity.setName("Rasgulla");
 
+        SweetDto mappedDto = new SweetDto();
+        mappedDto.setId(sweetId);
+        mappedDto.setName("Rasgulla");
+
         when(sweetRepository.findById(sweetId)).thenReturn(Optional.of(sweetEntity));
-        when(mapper.map(sweetEntity, SweetDto.class)).thenReturn(new SweetDto()); // Mock mapping
+        when(mapper.map(sweetEntity, SweetDto.class)).thenReturn(mappedDto);
 
         // Act
         SweetDto foundSweet = sweetService.getSweet(sweetId);
 
         // Assert
         assertNotNull(foundSweet);
+        assertEquals("Rasgulla", foundSweet.getName());
         verify(sweetRepository, times(1)).findById(sweetId);
+        verify(mapper, times(1)).map(sweetEntity, SweetDto.class);
     }
+
 
     @Test
     void testGetSweet_WhenSweetDoesNotExist_ShouldThrowException() {
