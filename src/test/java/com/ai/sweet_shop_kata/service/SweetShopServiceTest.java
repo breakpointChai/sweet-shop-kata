@@ -149,4 +149,18 @@ class SweetShopServiceTest {
         verify(sweetRepository, times(1)).findById(sweetId);
         verify(sweetRepository, times(1)).delete(sweetEntity);
     }
+    @Test
+    void testSearchByTitle_ShouldReturnMatchingSweets() {
+        // Arrange
+        String keyword = "kaju";
+        List<SweetEntity> foundEntities = List.of(new SweetEntity());
+        when(sweetRepository.findByNameContainingIgnoreCase(keyword)).thenReturn(foundEntities);
+
+        // Act
+        List<SweetDto> result = sweetService.searchByTitle(keyword);
+
+        // Assert
+        assertEquals(1, result.size());
+        verify(sweetRepository, times(1)).findByNameContainingIgnoreCase(keyword);
+    }
 }
