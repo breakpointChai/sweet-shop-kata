@@ -111,4 +111,27 @@ class SweetShopServiceTest {
         assertEquals(2, sweets.size());
         verify(sweetRepository, times(1)).findAll();
     }
+
+    @Test
+    void testUpdateSweet_WhenSweetExists_ShouldUpdateAndReturnDto() {
+        // Arrange
+        String sweetId = "1";
+        SweetDto sweetDtoToUpdate = new SweetDto();
+        sweetDtoToUpdate.setId(sweetId);
+        sweetDtoToUpdate.setName("Updated Name");
+
+        SweetEntity existingSweet = new SweetEntity();
+        existingSweet.setId(sweetId);
+
+        when(sweetRepository.findById(sweetId)).thenReturn(Optional.of(existingSweet));
+        when(sweetRepository.save(any(SweetEntity.class))).thenReturn(existingSweet);
+
+        // Act
+        SweetDto updatedSweet = sweetService.updateSweet(sweetDtoToUpdate);
+
+        // Assert
+        assertNotNull(updatedSweet);
+        verify(sweetRepository, times(1)).findById(sweetId);
+        verify(sweetRepository, times(1)).save(any(SweetEntity.class));
+    }
 }
