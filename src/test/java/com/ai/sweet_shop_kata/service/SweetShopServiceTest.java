@@ -10,8 +10,7 @@ import org.modelmapper.ModelMapper;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class SweetShopServiceTest {
@@ -81,6 +80,20 @@ class SweetShopServiceTest {
 
         // Assert
         assertNotNull(foundSweet);
+        verify(sweetRepository, times(1)).findById(sweetId);
+    }
+
+    @Test
+    void testGetSweet_WhenSweetDoesNotExist_ShouldThrowException() {
+        // Arrange
+        String sweetId = "99";
+        when(sweetRepository.findById(sweetId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThrows(RuntimeException.class, () -> {
+            sweetService.getSweet(sweetId);
+        });
+
         verify(sweetRepository, times(1)).findById(sweetId);
     }
 }
