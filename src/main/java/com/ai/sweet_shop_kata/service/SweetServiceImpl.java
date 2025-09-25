@@ -29,9 +29,22 @@ public class SweetServiceImpl implements SweetService {
 
     }
 
+    // update sweet
     @Override
     public SweetDto updateSweet(SweetDto sweetDto) {
-        return null;
+        SweetEntity existingSweet = sweetRepository.findById(sweetDto.getId())
+                .orElseThrow(() -> new RuntimeException("Sweet not found with id: " + sweetDto.getId()));
+
+        existingSweet.setName(sweetDto.getName());
+        existingSweet.setDescription(sweetDto.getDescription());
+        existingSweet.setPrice(sweetDto.getPrice());
+        existingSweet.setCategory(sweetDto.getCategory());
+        existingSweet.setQuantity(sweetDto.getQuantity());
+        existingSweet.setStock(sweetDto.isStock());
+        existingSweet.setImageUrl(sweetDto.getImageUrl());
+
+        SweetEntity updatedSweet = sweetRepository.save(existingSweet);
+        return mapper.map(updatedSweet, SweetDto.class);
     }
 
     @Override
