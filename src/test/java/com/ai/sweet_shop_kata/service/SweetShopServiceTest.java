@@ -134,4 +134,19 @@ class SweetShopServiceTest {
         verify(sweetRepository, times(1)).findById(sweetId);
         verify(sweetRepository, times(1)).save(any(SweetEntity.class));
     }
+
+    @Test
+    void testDeleteSweet_WhenSweetExists_ShouldDeleteSweet() {
+        // Arrange
+        String sweetId = "1";
+        SweetEntity sweetEntity = new SweetEntity();
+        when(sweetRepository.findById(sweetId)).thenReturn(Optional.of(sweetEntity));
+
+        // Act
+        sweetService.deleteSweet(sweetId);
+
+        // Assert
+        verify(sweetRepository, times(1)).findById(sweetId);
+        verify(sweetRepository, times(1)).delete(sweetEntity);
+    }
 }
