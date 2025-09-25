@@ -17,11 +17,10 @@ public class SweetEntity {
     private String id;
     private String name;
     private String category;
-    private int price;
+    private double price; // Corrected from int to double
     private int quantity;
     private boolean stock;
     @Column(length = 10000)
     private String description;
     private String imageUrl;
-
 }

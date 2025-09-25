@@ -17,6 +17,7 @@ public class SweetServiceImpl implements SweetService {
     @Autowired
     SweetRepository sweetRepository;
 
+    //add Sweet
     @Override
     public SweetDto addSweet(SweetDto sweetDto) {
         SweetEntity sweetEntity = mapper.map(sweetDto, SweetEntity.class);
@@ -36,10 +37,12 @@ public class SweetServiceImpl implements SweetService {
     public void deleteSweet(String id) {
 
     }
-
+    // get single sweet
     @Override
     public SweetDto getSweet(String id) {
-        return null;
+        SweetEntity sweetEntity = sweetRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Sweet not found with id: " + id));
+        return mapper.map(sweetEntity, SweetDto.class);
     }
 
     @Override
