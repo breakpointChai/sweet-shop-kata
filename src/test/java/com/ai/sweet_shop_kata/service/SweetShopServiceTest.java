@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -60,5 +61,26 @@ class SweetShopServiceTest {
         assertEquals(100, savedSweet.getQuantity());
 
         verify(sweetRepository, times(1)).save(any(SweetEntity.class));
+    }
+
+
+
+    @Test
+    void testGetSweet_WhenSweetExists_ShouldReturnSweetDto() {
+        // Arrange
+        String sweetId = "1";
+        SweetEntity sweetEntity = new SweetEntity();
+        sweetEntity.setId(sweetId);
+        sweetEntity.setName("Rasgulla");
+
+        when(sweetRepository.findById(sweetId)).thenReturn(Optional.of(sweetEntity));
+        when(mapper.map(sweetEntity, SweetDto.class)).thenReturn(new SweetDto()); // Mock mapping
+
+        // Act
+        SweetDto foundSweet = sweetService.getSweet(sweetId);
+
+        // Assert
+        assertNotNull(foundSweet);
+        verify(sweetRepository, times(1)).findById(sweetId);
     }
 }
