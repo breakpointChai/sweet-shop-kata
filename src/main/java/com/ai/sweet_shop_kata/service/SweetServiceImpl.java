@@ -47,9 +47,12 @@ public class SweetServiceImpl implements SweetService {
         return mapper.map(updatedSweet, SweetDto.class);
     }
 
+    // delete sweet
     @Override
     public void deleteSweet(String id) {
-
+        SweetEntity sweetToDelete = sweetRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Sweet not found with id: " + id));
+        sweetRepository.delete(sweetToDelete);
     }
     // get single sweet
     @Override
