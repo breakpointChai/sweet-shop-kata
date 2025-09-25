@@ -1,20 +1,30 @@
 package com.ai.sweet_shop_kata.service;
 
 import com.ai.sweet_shop_kata.dto.SweetDto;
+import com.ai.sweet_shop_kata.model.SweetEntity;
+import com.ai.sweet_shop_kata.repository.SweetRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
-public class SweerServiceImpl implements SweetService {
+public class SweetServiceImpl implements SweetService {
     @Autowired
-    private ModelMapper mapper;
+    ModelMapper mapper;
+    @Autowired
+    SweetRepository sweetRepository;
+
     @Override
     public SweetDto addSweet(SweetDto sweetDto) {
+        SweetEntity sweetEntity = mapper.map(sweetDto, SweetEntity.class);
+        String id = UUID.randomUUID().toString();
+        sweetEntity.setId(id);
+        SweetEntity saveSweet=sweetRepository.save(sweetEntity);
+        return mapper.map(saveSweet, SweetDto.class);
 
-        return null;
     }
 
     @Override
