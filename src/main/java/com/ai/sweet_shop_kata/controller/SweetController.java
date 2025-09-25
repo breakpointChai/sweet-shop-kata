@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/sweets")
 public class SweetController {
@@ -32,6 +34,20 @@ public class SweetController {
     public ResponseEntity<Void> deleteSweet(@PathVariable String id) {
         sweetService.deleteSweet(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    // get all sweets
+    @GetMapping
+    public ResponseEntity<List<SweetDto>> getAllSweets() {
+        List<SweetDto> sweets = sweetService.getSweets();
+        return new ResponseEntity<>(sweets, HttpStatus.OK);
+    }
+
+    // get single sweet
+    @GetMapping("/{id}")
+    public ResponseEntity<SweetDto> getSweetById(@PathVariable String id) {
+        SweetDto sweet = sweetService.getSweet(id);
+        return new ResponseEntity<>(sweet, HttpStatus.OK);
     }
 
 
