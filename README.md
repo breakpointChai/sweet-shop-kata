@@ -23,6 +23,25 @@ The application features a **secure, scalable architecture** with role-based acc
 - 📈 **Order Management** *(Future Scope)* — View all orders, update statuses (e.g., *Shipped*, *Delivered*), and manage fulfillment.
 
 ---
+```mermaid
+sequenceDiagram
+    participant Client as 👩‍🍳 Customer (Frontend)
+    participant API as 🌐 Sweet Shop API (Backend)
+    participant DB as 🗄️ MySQL Database
+
+    Client->>API: POST /api/auth/login (email, password)
+    API->>DB: Find user by email and verify password
+    DB-->>API: User details with role
+    API-->>Client: Returns JWT Token 🔑
+
+    Note over Client: Stores JWT Token for future requests
+
+    Client->>API: GET /api/sweets (includes JWT in Header)
+    API->>API: Verifies JWT signature and role
+    API->>DB: Fetch all sweets
+    DB-->>API: Returns list of sweets
+    API-->>Client: 200 OK with sweet data
+
 
 ## 🛠️ Tech Stack & Tools
 
@@ -49,7 +68,7 @@ The application features a **secure, scalable architecture** with role-based acc
 
 1.  **Clone the Repository**
     ```bash
-    git clone [https://github.com/your-username/sweet-shop-kata.git](https://github.com/your-username/sweet-shop-kata.git)
+    git clone [https://github.com/breakpointChai/sweet-shop-kata.git](https://github.com/your-username/sweet-shop-kata.git)
     cd sweet-shop-kata
     ```
 
@@ -125,21 +144,3 @@ The application features a **secure, scalable architecture** with role-based acc
 
 Enjoy your delicious coding journey with Sweet Shop Kata!
 
-```mermaid
-sequenceDiagram
-    participant Client as 👩‍🍳 Customer (Frontend)
-    participant API as 🌐 Sweet Shop API (Backend)
-    participant DB as 🗄️ MySQL Database
-
-    Client->>API: POST /api/auth/login (email, password)
-    API->>DB: Find user by email and verify password
-    DB-->>API: User details with role
-    API-->>Client: Returns JWT Token 🔑
-
-    Note over Client: Stores JWT Token for future requests
-
-    Client->>API: GET /api/sweets (includes JWT in Header)
-    API->>API: Verifies JWT signature and role
-    API->>DB: Fetch all sweets
-    DB-->>API: Returns list of sweets
-    API-->>Client: 200 OK with sweet data
