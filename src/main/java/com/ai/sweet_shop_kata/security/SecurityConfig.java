@@ -32,7 +32,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
 
-                        // 2. CUSTOMER ENDPOINTS: Any logged-in user can access these
+                        // 2. AUTHENTICATED ENDPOINTS: Any logged-in user (Admin or User) can access
                         .requestMatchers(HttpMethod.GET, "/api/sweets/**").authenticated()
 
                         // 3. ROLE_USER ENDPOINTS: Only users with the "USER" role
@@ -40,6 +40,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/orders/**").hasRole("USER")
 
                         // 4. ROLE_ADMIN ENDPOINTS: Only users with the "ADMIN" role
+                        .requestMatchers("/api/ai/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/sweets/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/sweets/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/sweets/**").hasRole("ADMIN")
