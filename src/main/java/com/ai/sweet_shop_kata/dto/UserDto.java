@@ -24,4 +24,6 @@ public class UserDto {
 
 
     private String imageName;
+
+    private String role;
 }

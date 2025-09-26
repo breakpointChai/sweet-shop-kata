@@ -14,15 +14,15 @@ import lombok.*;
 @Table(name="users")
 public class UserEntity   {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id// Auto-increment ID
     private String userId;
 
     @Column(name = "user_name")
     private String name;
 
-    @Column(name="user_password,length=10")
+    @Column(name = "user_password", length = 100, nullable = false)
     private String password;
+
 
     @Column(name="user_email",unique = true)
     private String email;
@@ -32,5 +32,5 @@ public class UserEntity   {
     @Column(name = "user_image_name")
     private String imageName;
 
-
+    private String role;
 }
