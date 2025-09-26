@@ -24,7 +24,6 @@ The application features a **secure, scalable architecture** with role-based acc
 
 ---
 
-
 ## 🛠️ Tech Stack & Tools
 
 - **Backend:** Spring Boot 3
@@ -50,7 +49,7 @@ The application features a **secure, scalable architecture** with role-based acc
 
 1.  **Clone the Repository**
     ```bash
-    git clone [https://github.com/breakpointChai/sweet-shop-kata.git](https://github.com/your-username/sweet-shop-kata.git)
+    git clone [https://github.com/your-username/sweet-shop-kata.git](https://github.com/your-username/sweet-shop-kata.git)
     cd sweet-shop-kata
     ```
 
@@ -79,7 +78,6 @@ The application features a **secure, scalable architecture** with role-based acc
 
 
 ---
-
 
 ## 📝 API Endpoints
 
@@ -124,6 +122,9 @@ The application features a **secure, scalable architecture** with role-based acc
 
 ---
 
+Enjoy your delicious coding journey with Sweet Shop Kata!
+
+
 ```mermaid
 sequenceDiagram
     participant Client as 👩‍🍳 Customer (Frontend)
@@ -142,6 +143,3 @@ sequenceDiagram
     API->>DB: Fetch all sweets
     DB-->>API: Returns list of sweets
     API-->>Client: 200 OK with sweet data
-
-Enjoy your delicious coding journey with Sweet Shop Kata!
-
