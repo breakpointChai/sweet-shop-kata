@@ -29,9 +29,9 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ModelMapper modelMapper;
 
-    @Value("${razorpay.key.id}")
+    @Value("${RAZORPAY_KEY}")
     private String keyId;
-    @Value("${razorpay.key.secret}")
+    @Value("${RAZORPAY_SECRET}")
     private String keySecret;
 
     @Override
