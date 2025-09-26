@@ -5,14 +5,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class SweetRequestDto {
     private String id;
     private String name;
     private String description;
     private double price;
-    private String category;
     private int quantity;
     private boolean stock;
+    private String categoryId;
 }
