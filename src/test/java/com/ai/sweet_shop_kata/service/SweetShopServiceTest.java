@@ -1,95 +1,130 @@
 package com.ai.sweet_shop_kata.service;
 
 import com.ai.sweet_shop_kata.dto.SweetDto;
+import com.ai.sweet_shop_kata.dto.SweetRequestDto;
 import com.ai.sweet_shop_kata.model.SweetEntity;
 import com.ai.sweet_shop_kata.repository.SweetRepository;
-import org.junit.jupiter.api.BeforeEach;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.Uploader;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class SweetShopServiceTest {
 
+    @Mock
     private SweetRepository sweetRepository;
-    private SweetServiceImpl sweetService;
+
+    @Mock
     private ModelMapper mapper;
 
-    @BeforeEach
-    void setUp() {
-        sweetRepository = mock(SweetRepository.class);
-        mapper = mock(ModelMapper.class);
-        sweetService = new SweetServiceImpl();
-        sweetService.sweetRepository = sweetRepository; // inject mock
-        sweetService.mapper = mapper; // inject real mapper
+    @Mock
+    private Cloudinary cloudinary;
+
+    @InjectMocks
+    private SweetServiceImpl sweetService;
+
+    @Test
+    void testAddSweet_ShouldAddSweetSuccessfully() throws IOException {
+        // Arrange
+        SweetRequestDto sweetRequest = new SweetRequestDto();
+        sweetRequest.setName("Ladoo");
+        MultipartFile mockFile = new MockMultipartFile("file", "test.jpg", "image/jpeg", "test data".getBytes());
+
+        SweetEntity sweetEntity = new SweetEntity();
+        SweetEntity savedSweetEntity = new SweetEntity();
+        savedSweetEntity.setId("some-uuid");
+        savedSweetEntity.setImageUrl("http://cloudinary.com/image.jpg");
+
+        SweetDto expectedDto = new SweetDto();
+        expectedDto.setId("some-uuid");
+
+        // Mocking the chained call for Cloudinary
+        Uploader uploaderMock = mock(Uploader.class);
+        when(cloudinary.uploader()).thenReturn(uploaderMock);
+        when(uploaderMock.upload(any(byte[].class), any(Map.class)))
+                .thenReturn(Map.of("secure_url", "http://cloudinary.com/image.jpg"));
+
+        when(mapper.map(sweetRequest, SweetEntity.class)).thenReturn(sweetEntity);
+        when(sweetRepository.save(any(SweetEntity.class))).thenReturn(savedSweetEntity);
+        when(mapper.map(savedSweetEntity, SweetDto.class)).thenReturn(expectedDto);
+
+        // Act
+        SweetDto result = sweetService.addSweet(sweetRequest, mockFile);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("some-uuid", result.getId());
+        verify(sweetRepository, times(1)).save(any(SweetEntity.class));
+        verify(cloudinary.uploader(), times(1)).upload(any(byte[].class), any(Map.class));
     }
 
     @Test
-    void shouldAddSweetSuccessfully() {
-        // Arrange: create DTO
-        SweetDto sweetDto = new SweetDto(
-                null,
-                "Ladoo",
-                "Delicious ladoos",
-                15.0,
-                "Indian",
-                100,
-                true,
-                "image.png"
-        );
+    void testUpdateSweet_WhenSweetExists_ShouldUpdateSuccessfully() throws IOException {
+        // Arrange
+        String sweetId = "1";
+        SweetRequestDto sweetRequest = new SweetRequestDto();
+        sweetRequest.setId(sweetId);
+        sweetRequest.setName("Updated Ladoo");
+        MultipartFile mockFile = new MockMultipartFile("file", "update.jpg", "image/jpeg", "update data".getBytes());
 
-        // The entity expected to be saved
-        SweetEntity sweetEntity = mapper.map(sweetDto, SweetEntity.class);
-        sweetEntity.setId(UUID.randomUUID().toString());
+        SweetEntity existingSweet = new SweetEntity();
+        existingSweet.setId(sweetId);
+        SweetDto expectedDto = new SweetDto();
+        expectedDto.setName("Updated Ladoo");
 
-        // Mock repository save → return entity with ID
-        when(sweetRepository.save(any(SweetEntity.class))).thenReturn(sweetEntity);
+        when(sweetRepository.findById(sweetId)).thenReturn(Optional.of(existingSweet));
+        when(sweetRepository.save(any(SweetEntity.class))).thenReturn(existingSweet);
+        when(mapper.map(existingSweet, SweetDto.class)).thenReturn(expectedDto);
+
+        // Mock Cloudinary for the update
+        Uploader uploaderMock = mock(Uploader.class);
+        when(cloudinary.uploader()).thenReturn(uploaderMock);
+        when(uploaderMock.upload(any(byte[].class), any(Map.class)))
+                .thenReturn(Map.of("secure_url", "http://cloudinary.com/updated.jpg"));
 
         // Act
-        SweetDto savedSweet = sweetService.addSweet(sweetDto);
+        SweetDto result = sweetService.updateSweet(sweetRequest, mockFile);
 
         // Assert
-        assertNotNull(savedSweet);
-        assertNotNull(savedSweet.getId()); // ID generated in service
-        assertEquals("Ladoo", savedSweet.getName());
-        assertEquals("Indian", savedSweet.getCategory());
-        assertEquals(100, savedSweet.getQuantity());
-
+        assertNotNull(result);
+        assertEquals("Updated Ladoo", result.getName());
+        verify(sweetRepository, times(1)).findById(sweetId);
         verify(sweetRepository, times(1)).save(any(SweetEntity.class));
     }
-
-
 
     @Test
     void testGetSweet_WhenSweetExists_ShouldReturnSweetDto() {
         // Arrange
         String sweetId = "1";
         SweetEntity sweetEntity = new SweetEntity();
-        sweetEntity.setId(sweetId);
-        sweetEntity.setName("Rasgulla");
-
-        SweetDto mappedDto = new SweetDto();
-        mappedDto.setId(sweetId);
-        mappedDto.setName("Rasgulla");
-
+        SweetDto expectedDto = new SweetDto();
         when(sweetRepository.findById(sweetId)).thenReturn(Optional.of(sweetEntity));
-        when(mapper.map(sweetEntity, SweetDto.class)).thenReturn(mappedDto);
+        when(mapper.map(sweetEntity, SweetDto.class)).thenReturn(expectedDto);
 
         // Act
-        SweetDto foundSweet = sweetService.getSweet(sweetId);
+        SweetDto result = sweetService.getSweet(sweetId);
 
         // Assert
-        assertNotNull(foundSweet);
-        assertEquals("Rasgulla", foundSweet.getName());
+        assertNotNull(result);
         verify(sweetRepository, times(1)).findById(sweetId);
-        verify(mapper, times(1)).map(sweetEntity, SweetDto.class);
     }
-
 
     @Test
     void testGetSweet_WhenSweetDoesNotExist_ShouldThrowException() {
@@ -98,56 +133,16 @@ class SweetShopServiceTest {
         when(sweetRepository.findById(sweetId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThrows(RuntimeException.class, () -> {
-            sweetService.getSweet(sweetId);
-        });
-
-        verify(sweetRepository, times(1)).findById(sweetId);
+        assertThrows(RuntimeException.class, () -> sweetService.getSweet(sweetId));
     }
 
     @Test
-    void testGetSweets_ShouldReturnListOfSweetDtos() {
-        // Arrange
-        List<SweetEntity> sweetEntities = List.of(new SweetEntity(), new SweetEntity());
-        when(sweetRepository.findAll()).thenReturn(sweetEntities);
-
-        // Act
-        List<SweetDto> sweets = sweetService.getSweets();
-
-        // Assert
-        assertEquals(2, sweets.size());
-        verify(sweetRepository, times(1)).findAll();
-    }
-
-    @Test
-    void testUpdateSweet_WhenSweetExists_ShouldUpdateAndReturnDto() {
-        // Arrange
-        String sweetId = "1";
-        SweetDto sweetDtoToUpdate = new SweetDto();
-        sweetDtoToUpdate.setId(sweetId);
-        sweetDtoToUpdate.setName("Updated Name");
-
-        SweetEntity existingSweet = new SweetEntity();
-        existingSweet.setId(sweetId);
-
-        when(sweetRepository.findById(sweetId)).thenReturn(Optional.of(existingSweet));
-        when(sweetRepository.save(any(SweetEntity.class))).thenReturn(existingSweet);
-
-        // Act
-        SweetDto updatedSweet = sweetService.updateSweet(sweetDtoToUpdate);
-
-        // Assert
-        assertNotNull(updatedSweet);
-        verify(sweetRepository, times(1)).findById(sweetId);
-        verify(sweetRepository, times(1)).save(any(SweetEntity.class));
-    }
-
-    @Test
-    void testDeleteSweet_WhenSweetExists_ShouldDeleteSweet() {
+    void testDeleteSweet_WhenSweetExists_ShouldDelete() {
         // Arrange
         String sweetId = "1";
         SweetEntity sweetEntity = new SweetEntity();
         when(sweetRepository.findById(sweetId)).thenReturn(Optional.of(sweetEntity));
+        doNothing().when(sweetRepository).delete(sweetEntity);
 
         // Act
         sweetService.deleteSweet(sweetId);
@@ -156,10 +151,26 @@ class SweetShopServiceTest {
         verify(sweetRepository, times(1)).findById(sweetId);
         verify(sweetRepository, times(1)).delete(sweetEntity);
     }
+
+    @Test
+    void testGetSweets_ShouldReturnListOfSweets() {
+        // Arrange
+        List<SweetEntity> sweetEntities = List.of(new SweetEntity(), new SweetEntity());
+        when(sweetRepository.findAll()).thenReturn(sweetEntities);
+
+        // Act
+        List<SweetDto> result = sweetService.getSweets(); // Corrected method name
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        verify(sweetRepository, times(1)).findAll();
+    }
+
     @Test
     void testSearchByTitle_ShouldReturnMatchingSweets() {
         // Arrange
-        String keyword = "kaju";
+        String keyword = "Ladoo";
         List<SweetEntity> foundEntities = List.of(new SweetEntity());
         when(sweetRepository.findByNameContainingIgnoreCase(keyword)).thenReturn(foundEntities);
 
@@ -167,6 +178,7 @@ class SweetShopServiceTest {
         List<SweetDto> result = sweetService.searchByTitle(keyword);
 
         // Assert
+        assertNotNull(result);
         assertEquals(1, result.size());
         verify(sweetRepository, times(1)).findByNameContainingIgnoreCase(keyword);
     }

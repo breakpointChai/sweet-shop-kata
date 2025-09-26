@@ -1,36 +1,30 @@
 package com.ai.sweet_shop_kata.model;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
-
 @Entity
-@Table(name="users")
-public class UserEntity   {
+@Table(name = "users")
+public class UserEntity {
 
-    @Id// Auto-increment ID
+    @Id
     private String userId;
-
-    @Column(name = "user_name")
+    @Column(name = "name")
     private String name;
-
-    @Column(name = "user_password", length = 100, nullable = false)
-    private String password;
-
-
-    @Column(name="user_email",unique = true)
+    @Column(name = "email")
     private String email;
+    @Column(name = "user_password")
+    private String password;
     private String gender;
-
-
-    @Column(name = "user_image_name")
-    private String imageName;
-
-    private String role;
+    private String role; // e.g., "ROLE_USER", "ROLE_ADMIN"
 }
