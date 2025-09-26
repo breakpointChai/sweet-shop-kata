@@ -1,34 +1,23 @@
 package com.ai.sweet_shop_kata.service;
 
 import com.ai.sweet_shop_kata.dto.SweetDto;
-import com.ai.sweet_shop_kata.model.SweetEntity;
-import jdk.jfr.Category;
+import com.ai.sweet_shop_kata.dto.SweetRequestDto;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface SweetService {
-
-    //create
-    SweetDto addSweet(SweetDto sweetDto);
-
-    //update
-    SweetDto updateSweet(SweetDto sweetDto);
-
-    //delete
+    //add sweet
+    SweetDto addSweet(SweetRequestDto sweetRequest, MultipartFile file) throws IOException;
+    //update sweet
+    SweetDto updateSweet(SweetRequestDto sweetRequest, MultipartFile file) throws IOException;
+    //delete sweet
     void deleteSweet(String id);
-
     //get single sweet
     SweetDto getSweet(String id);
-
-    //    get all sweets
+    //get all sweets
     List<SweetDto> getSweets();
-
-    //search by title
+    //get sweet by keyword
     List<SweetDto> searchByTitle(String title);
-
-
-
-
-
-
 }

@@ -1,81 +1,93 @@
 package com.ai.sweet_shop_kata.service;
 
 import com.ai.sweet_shop_kata.dto.SweetDto;
+import com.ai.sweet_shop_kata.dto.SweetRequestDto;
 import com.ai.sweet_shop_kata.model.SweetEntity;
 import com.ai.sweet_shop_kata.repository.SweetRepository;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.UUID;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class SweetServiceImpl implements SweetService {
-    @Autowired
-    ModelMapper mapper;
-    @Autowired
-    SweetRepository sweetRepository;
 
-    //add Sweet
+    @Autowired
+    private ModelMapper mapper;
+
+    @Autowired
+    private SweetRepository sweetRepository;
+
+    @Autowired
+    private Cloudinary cloudinary;
+
     @Override
-    public SweetDto addSweet(SweetDto sweetDto) {
-        SweetEntity sweetEntity = mapper.map(sweetDto, SweetEntity.class);
-        String id = UUID.randomUUID().toString();
-        sweetEntity.setId(id);
-        SweetEntity saveSweet=sweetRepository.save(sweetEntity);
-        return mapper.map(saveSweet, SweetDto.class);
+    public SweetDto addSweet(SweetRequestDto sweetRequest, MultipartFile file) throws IOException {
+        SweetEntity sweetEntity = mapper.map(sweetRequest, SweetEntity.class);
+        sweetEntity.setId(UUID.randomUUID().toString());
 
+        // Upload to Cloudinary
+        Map uploadResult = cloudinary.uploader().upload(file.getBytes(),
+                ObjectUtils.asMap("folder", "sweet_shop/sweets"));
+        sweetEntity.setImageUrl((String) uploadResult.get("secure_url"));
+
+        SweetEntity saved = sweetRepository.save(sweetEntity);
+        return mapper.map(saved, SweetDto.class);
     }
 
-    // update sweet
     @Override
-    public SweetDto updateSweet(SweetDto sweetDto) {
-        SweetEntity existingSweet = sweetRepository.findById(sweetDto.getId())
-                .orElseThrow(() -> new RuntimeException("Sweet not found with id: " + sweetDto.getId()));
+    public SweetDto updateSweet(SweetRequestDto sweetRequest, MultipartFile file) throws IOException {
+        SweetEntity existing = sweetRepository.findById(sweetRequest.getId())
+                .orElseThrow(() -> new RuntimeException("Sweet not found: " + sweetRequest.getId()));
 
-        existingSweet.setName(sweetDto.getName());
-        existingSweet.setDescription(sweetDto.getDescription());
-        existingSweet.setPrice(sweetDto.getPrice());
-        existingSweet.setCategory(sweetDto.getCategory());
-        existingSweet.setQuantity(sweetDto.getQuantity());
-        existingSweet.setStock(sweetDto.isStock());
-        existingSweet.setImageUrl(sweetDto.getImageUrl());
+        existing.setName(sweetRequest.getName());
+        existing.setDescription(sweetRequest.getDescription());
+        existing.setPrice(sweetRequest.getPrice());
+        existing.setCategory(sweetRequest.getCategory());
+        existing.setQuantity(sweetRequest.getQuantity());
+        existing.setStock(sweetRequest.isStock());
 
-        SweetEntity updatedSweet = sweetRepository.save(existingSweet);
-        return mapper.map(updatedSweet, SweetDto.class);
+        if (file != null && !file.isEmpty()) {
+            Map uploadResult = cloudinary.uploader().upload(file.getBytes(),
+                    ObjectUtils.asMap("folder", "sweet_shop/sweets"));
+            existing.setImageUrl((String) uploadResult.get("secure_url"));
+        }
+
+        SweetEntity updated = sweetRepository.save(existing);
+        return mapper.map(updated, SweetDto.class);
     }
 
-    // delete sweet
     @Override
     public void deleteSweet(String id) {
-        SweetEntity sweetToDelete = sweetRepository.findById(id)
+        SweetEntity sweet = sweetRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Sweet not found with id: " + id));
-        sweetRepository.delete(sweetToDelete);
-    }
-    // get single sweet
-    @Override
-    public SweetDto getSweet(String id) {
-        SweetEntity sweetEntity = sweetRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Sweet not found with id: " + id));
-        return mapper.map(sweetEntity, SweetDto.class);
+        sweetRepository.delete(sweet);
     }
 
-    // get all sweets
+    @Override
+    public SweetDto getSweet(String id) {
+        SweetEntity sweet = sweetRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Sweet not found with id: " + id));
+        return mapper.map(sweet, SweetDto.class);
+    }
+
     @Override
     public List<SweetDto> getSweets() {
-        List<SweetEntity> sweets = sweetRepository.findAll();
-        return sweets.stream()
-                .map(sweet -> mapper.map(sweet, SweetDto.class))
+        return sweetRepository.findAll().stream()
+                .map(s -> mapper.map(s, SweetDto.class))
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<SweetDto> searchByTitle(String title) {
-        List<SweetEntity> sweets = sweetRepository.findByNameContainingIgnoreCase(title);
-        return sweets.stream()
-                .map(sweet -> mapper.map(sweet, SweetDto.class))
+        return sweetRepository.findByNameContainingIgnoreCase(title).stream()
+                .map(s -> mapper.map(s, SweetDto.class))
                 .collect(Collectors.toList());
     }
 }
