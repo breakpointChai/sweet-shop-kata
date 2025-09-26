@@ -100,11 +100,11 @@ The application features a **secure, scalable architecture** with role-based acc
 | `/login` | `POST` | Log in & get a JWT token. | Public |
 
 ### 🤖 AI (`/api/ai`)
-| Endpoint | Method | Description | Access |
-|---|---|---|---|
+| Endpoint | Method | Description | Access         |
+|---|---|---|----------------|
 | `/generate-suggestions` | `POST` | Generate sweet descriptions, tags, and keywords. | **Admin Only** |
-| `/recipe` | `GET` | Get a recipe for a sweet. | **Admin Only** |
-| `/recipe/pdf` | `POST` | Download a recipe as a PDF. | **Admin Only** |
+| `/recipe` | `GET` | Get a recipe for a sweet. | **User Role**  |
+| `/recipe/pdf` | `POST` | Download a recipe as a PDF. | **User Role**  |
 
 ### 🍭 Sweets (`/api/sweets`)
 | Endpoint | Method | Description | Access |
