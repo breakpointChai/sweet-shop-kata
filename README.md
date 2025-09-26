@@ -79,6 +79,7 @@ The application features a **secure, scalable architecture** with role-based acc
 
 ---
 
+
 ## 📝 API Endpoints
 
 ### 🔑 Authentication (`/api/auth`)
@@ -123,3 +124,22 @@ The application features a **secure, scalable architecture** with role-based acc
 ---
 
 Enjoy your delicious coding journey with Sweet Shop Kata!
+
+```mermaid
+sequenceDiagram
+    participant Client as 👩‍🍳 Customer (Frontend)
+    participant API as 🌐 Sweet Shop API (Backend)
+    participant DB as 🗄️ MySQL Database
+
+    Client->>API: POST /api/auth/login (email, password)
+    API->>DB: Find user by email and verify password
+    DB-->>API: User details with role
+    API-->>Client: Returns JWT Token 🔑
+
+    Note over Client: Stores JWT Token for future requests
+
+    Client->>API: GET /api/sweets (includes JWT in Header)
+    API->>API: Verifies JWT signature and role
+    API->>DB: Fetch all sweets
+    DB-->>API: Returns list of sweets
+    API-->>Client: 200 OK with sweet data
