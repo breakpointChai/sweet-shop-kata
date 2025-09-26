@@ -1,9 +1,6 @@
 package com.ai.sweet_shop_kata.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -23,4 +20,8 @@ public class SweetEntity {
     @Column(length = 10000)
     private String description;
     private String imageUrl;
+    // It links this Sweet to a Category.
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "category_id")
+    private CategoryEntity categoryId;
 }
