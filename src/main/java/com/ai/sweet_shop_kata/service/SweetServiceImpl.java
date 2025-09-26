@@ -49,7 +49,7 @@ public class SweetServiceImpl implements SweetService {
         existing.setName(sweetRequest.getName());
         existing.setDescription(sweetRequest.getDescription());
         existing.setPrice(sweetRequest.getPrice());
-        existing.setCategory(sweetRequest.getCategory());
+        existing.setCategory(sweetRequest.getCategoryId());
         existing.setQuantity(sweetRequest.getQuantity());
         existing.setStock(sweetRequest.isStock());
 
